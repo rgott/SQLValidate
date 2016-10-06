@@ -1,5 +1,6 @@
 ﻿using Sql_Injection.Models;
 using System.Web.Mvc;
+using System;
 
 namespace Sql_Injection.Controllers
 {
@@ -10,27 +11,9 @@ namespace Sql_Injection.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Index(string id)
+        public ActionResult Index()
         {
-            var model = new SqlViewModel();
-            model.ID = id;
-            if (id != null)
-            {
-                // TODO: make more secure
-                if (id.Contains("&"))
-                {
-                    model.isValid = false;
-                }
-                else
-                {
-                    model.isValid = true;
-                }
-            }
-            else
-            {
-                model.isValid = null;
-            }
-            return View(model);
+            return View();
         }
 
         [HttpPost]
@@ -38,12 +21,22 @@ namespace Sql_Injection.Controllers
         {
             if(model?.sqlQuery != null)
             {
-                if(model.sqlQuery.Contains("&"))
-                {
-                    model.isValid = false;
-                }
+                model.isValidQuery = validateSqlQuery(model.sqlQuery);
             }
             return View(model);
+        }
+
+        private bool? validateSqlQuery(string sqlQuery)
+        {
+            // TODO: more validation tests (use regex?)
+            if (sqlQuery.Contains("&"))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

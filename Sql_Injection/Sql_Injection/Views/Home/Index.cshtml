@@ -6,22 +6,27 @@
     <div class="card-content white-text">
         <span class="card-title">
             @{
-
-                if (Model?.isValid == null || Model?.isValid == true)
+                if (Model == null || Model.isValidQuery == null)
                 {
-                    Write("MODELVALID"+Model.isValid);
-                    Write("No Error");
+
                 }
                 else
                 {
-                    Write("Error");
+                    if (Model.isValidQuery == true)
+                    {
+                        Write("No Error");
+                    }
+                    else
+                    {
+                        Write("Error");
+                    }
                 }
             }
         </span>
         <p>
 
             @{
-                using (Html.BeginForm("index","Home"))
+                using (Html.BeginForm("index", "Home"))
                 {
                     @Html.TextBoxFor(m => m.sqlQuery);
                 }
