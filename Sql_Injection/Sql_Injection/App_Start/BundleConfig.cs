@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Optimization;
+﻿using System.Web.Optimization;
 
 namespace Sql_Injection
 {
@@ -19,9 +18,13 @@ namespace Sql_Injection
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
-                      "~/Scripts/respond.js"));
+            bundles.Add(new StyleBundle("~/bundles/materialize-style").Include(
+                        "~/Content/materialize/css/materialize.min.css",
+                        "~/Content/css/custom/mdl-fonts.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/materialize-script").Include(
+                        "~/Scripts/materialize/materialize.min.js",
+                        "~/Scripts/custom/Site.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",

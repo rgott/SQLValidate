@@ -1,30 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Sql_Injection.Models;
 using System.Web.Mvc;
 
 namespace Sql_Injection.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        /// <summary>
+        /// Function gets id to check with database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Index(string id)
         {
-            return View();
+            var model = new SqlViewModel();
+            model.ID = id;
+            if (id != null)
+            {
+                // TODO: make more secure
+                if (id.Contains("&"))
+                {
+                    model.isValid = false;
+                }
+                else
+                {
+                    model.isValid = true;
+                }
+            }
+            else
+            {
+                model.isValid = null;
+            }
+            return View(model);
         }
 
-        public ActionResult About()
+        [HttpPost]
+        public ActionResult Index(SqlViewModel model)
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            if(model?.sqlQuery != null)
+            {
+                if(model.sqlQuery.Contains("&"))
+                {
+                    model.isValid = false;
+                }
+            }
+            return View(model);
         }
     }
 }

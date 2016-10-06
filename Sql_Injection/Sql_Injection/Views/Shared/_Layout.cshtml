@@ -1,44 +1,42 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link rel="icon" href="~/Content/Images/favicon.ico" type="image/x-icon" />
+    <meta name="author" content="">
+    <title>Robert Gott</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+    <title>Parallax Template - Materialize</title>
+    @Styles.Render("~/bundles/materialize-style")
+    @Styles.Render("~/bundles/custom-css")
 
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                </ul>
-                @Html.Partial("_LoginPartial")
-            </div>
+    <nav class="red lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+            <a id="logo-container" href="~/Home/Index" class="brand-logo">SQL Injection Testing</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="@Url.Action("index", new { id="1" })">Attack 1</a></li>
+                <li><a href="@Url.Action("index", new { id="2" })">Attack 2</a></li>
+                <li><a href="@Url.Action("index", new { id="3" })">Attack 3</a></li>
+            </ul>
+            <ul id="nav-mobile" class="side-nav">
+                <li><a href="@Url.Action("index", new { id="1" })">Attack 1</a></li>
+                <li><a href="@Url.Action("index", new { id="2" })">Attack 2</a></li>
+                <li><a href="@Url.Action("index", new { id="3" })">Attack 3</a></li>
+            </ul>
+            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
         </div>
-    </div>
-    <div class="container body-content">
+    </nav>
+    <main>
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
-
+    </main>
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/materialize-script")
 </body>
 </html>
