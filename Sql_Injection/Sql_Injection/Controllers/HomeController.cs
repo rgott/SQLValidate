@@ -1,6 +1,8 @@
 ﻿using Sql_Injection.Models;
-using System.Web.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
 
 namespace Sql_Injection.Controllers
 {
@@ -13,14 +15,15 @@ namespace Sql_Injection.Controllers
         /// <returns></returns>
         public ActionResult Index()
         {
-            return View();
+            return View(new SqlViewModel());
         }
 
         [HttpPost]
         public ActionResult Index(SqlViewModel model)
         {
-            if(model?.sqlQuery != null)
+            if (model?.sqlQuery != null)
             {
+                // TODO: change method naming convention
                 model.isValidQuery = validateSqlQuery(model.sqlQuery);
             }
             return View(model);
@@ -28,15 +31,120 @@ namespace Sql_Injection.Controllers
 
         private bool? validateSqlQuery(string sqlQuery)
         {
-            // TODO: more validation tests (use regex?)
-            if (sqlQuery.Contains("&"))
+            // equalize string for parsing
+            sqlQuery = sqlQuery.ToLower();
+
+            int indexOfWhereClause = sqlQuery.IndexOf("where"); // reduce the amount tested
+            if (indexOfWhereClause == -1) // if no where clause the query must be logically secure
+                return true;
+            else
+                indexOfWhereClause += "where".Length;
+
+            // get everything after "where" clause
+            sqlQuery = sqlQuery.Substring(indexOfWhereClause, sqlQuery.Length - indexOfWhereClause);
+
+            // resolve issues that may occur between the parser and the query
+            sqlQuery = sqlQuery
+                .Replace(";", "")
+                .Replace("\"", "'");
+            return isValidExpression(getExpressionListFromQuery(sqlQuery));
+            //return validateSqlQueryFull(sqlQuery);
+        }
+
+        private SortedSet<string> getExpressionListFromQuery(string sqlQuery)
+        {
+            SortedSet<string> list = new SortedSet<string>();
+            // get all possible security flaws
+            // find or statements
+            // find operators between statements
+            // "operator and operator or operator"
+
+            int prevIndex = 0;
+            int index;
+            while ((index = sqlQuery.IndexOf("or", prevIndex + 1)) != -1)
             {
-                return false;
+                // get left side
+                int tempV = prevIndex + "or".Length;
+                string left = sqlQuery.Substring(tempV, index - tempV);
+                int indexAND = left.LastIndexOf("and");
+                if (indexAND != -1)
+                {
+                    int tmpLen = indexAND + "and".Length;
+                    left = left.Substring(tmpLen, left.Length - tmpLen);
+                }
+
+                // get right side
+                int tmpV = index + "or ".Length;
+                string nextToken = sqlQuery.Substring(tmpV, sqlQuery.Length - tmpV);
+                string right = nextToken;
+                int RndexAND = right.IndexOf("and");
+                int RndexOR = right.IndexOf("or", 1);
+
+                RndexAND = (RndexAND == -1) ? 0 : RndexAND;
+                RndexOR = (RndexOR == -1) ? 0 : RndexOR;
+                int cndex = (RndexAND < RndexOR) ? RndexAND : RndexOR;
+                cndex = (cndex == 0) ? right.Length :cndex;
+                right = right.Substring(0, cndex);
+
+                list.Add(left.Trim());
+                list.Add(right.Trim());
+                prevIndex = index;
+            }
+            return list;
+        }
+
+        private bool? isValidExpression(SortedSet<string> expressionList)
+        {
+            var stdOperaterToken = new List<string>(9) { "=", "like","not like", "<>", "!=", ">", "<", ">=", "<=" };
+            expressionList.Remove("");
+            foreach (var item in expressionList)
+            {
+                string stdOperator = stdOperaterToken.Find(m => item.Contains(m));
+                int index = item.IndexOf(stdOperator);
+                //get left of index
+                string left = item.Substring(0, index);
+
+                // get right of index without operator
+                int val = index + stdOperator.Length;
+                string right = item.Substring(val, item.Length - val);
+
+                if(isValidSqlExpression(left) && isValidSqlExpression(right))
+                    return false;
+            }
+            return true;
+        }
+
+        private bool isValidSqlExpression(string value)
+        {
+            const string quoteMark = "'";
+
+            /*
+             * if both have quote marks then they are strings
+             * if no quote marks they must be integers
+             * if function then will have () function(3 * function(3)) must be either function or constant to fail
+             */
+
+            // TODO: add arithmetic operations (e.g. 3 * 3) Hint: recursion may be required
+            if (value.Contains("(")) //function fragment 
+            {
+                // TODO: add functions (e.g. fun(value * fun(3))) Hint: recursion may be needed
+                    // function seen as constant
+            }
+            else if (value.Contains(quoteMark))
+            { // then is string => constant
+                return true;
             }
             else
             {
-                return true;
+                double placeHold; // only used to satisfy function parameter
+                if (double.TryParse(value, out placeHold))
+                    return true; // if integer => constant
             }
+            return false;
+        }
+        private bool isValidRange(string[] array, int minTest, int maxText)
+        {
+            return minTest >= 0 && maxText < array.Length;
         }
     }
 }

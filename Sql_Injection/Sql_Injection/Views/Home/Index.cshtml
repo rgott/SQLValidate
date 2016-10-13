@@ -2,38 +2,16 @@
 @{
     ViewBag.Title = "Home Page";
 }
-<div class="card blue-grey darken-1">
+<div class="card @Model.isValidQueryColor darken-1">
     <div class="card-content white-text">
         <span class="card-title">
-            @{
-                if (Model == null || Model.isValidQuery == null)
-                {
-
-                }
-                else
-                {
-                    if (Model.isValidQuery == true)
-                    {
-                        Write("No Error");
-                    }
-                    else
-                    {
-                        Write("Error");
-                    }
-                }
-            }
+            @Model.isValidQueryString
         </span>
         <p>
-
             @{
                 using (Html.BeginForm("index", "Home"))
                 {
                     @Html.TextBoxFor(m => m.sqlQuery);
-                }
-                if (Model != null)
-                {
-                    Write(Model.ID);
-                    Write(Model.ExplainationText);
                 }
             }
         </p>
