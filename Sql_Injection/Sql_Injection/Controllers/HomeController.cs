@@ -1,7 +1,5 @@
 ﻿using Sql_Injection.Models;
-using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Web.Mvc;
 
 namespace Sql_Injection.Controllers
@@ -51,66 +49,86 @@ namespace Sql_Injection.Controllers
             //return validateSqlQueryFull(sqlQuery);
         }
 
-        private SortedSet<string> getExpressionListFromQuery(string sqlQuery)
+        private List<string> getExpressionListFromQuery(string sqlQuery)
         {
-            SortedSet<string> list = new SortedSet<string>();
+            //TODO: remove once tested multiSplit
+            
+            //SortedSet<string> list = new SortedSet<string>();
             // get all possible security flaws
             // find or statements
             // find operators between statements
             // "operator and operator or operator"
 
-            int prevIndex = 0;
-            int index;
-            while ((index = sqlQuery.IndexOf("or", prevIndex + 1)) != -1)
-            {
-                // get left side
-                int tempV = prevIndex + "or".Length;
-                string left = sqlQuery.Substring(tempV, index - tempV);
-                int indexAND = left.LastIndexOf("and");
-                if (indexAND != -1)
-                {
-                    int tmpLen = indexAND + "and".Length;
-                    left = left.Substring(tmpLen, left.Length - tmpLen);
-                }
+            //int prevIndex = 0;
+            //int index;
 
-                // get right side
-                int tmpV = index + "or ".Length;
-                string nextToken = sqlQuery.Substring(tmpV, sqlQuery.Length - tmpV);
-                string right = nextToken;
-                int RndexAND = right.IndexOf("and");
-                int RndexOR = right.IndexOf("or", 1);
 
-                RndexAND = (RndexAND == -1) ? 0 : RndexAND;
-                RndexOR = (RndexOR == -1) ? 0 : RndexOR;
-                int cndex = (RndexAND < RndexOR) ? RndexAND : RndexOR;
-                cndex = (cndex == 0) ? right.Length :cndex;
-                right = right.Substring(0, cndex);
+            //while ((index = sqlQuery.IndexOf("or", prevIndex + 1)) != -1)
+            //{
+            //    // get left side
+            //    int tempV = prevIndex + "or".Length;
+            //    string left = sqlQuery.Substring(tempV, index - tempV);
+            //    int indexAND = left.LastIndexOf("and");
+            //    if (indexAND != -1)
+            //    {
+            //        int tmpLen = indexAND + "and".Length;
+            //        left = left.Substring(tmpLen, left.Length - tmpLen);
+            //    }
 
-                list.Add(left.Trim());
-                list.Add(right.Trim());
-                prevIndex = index;
-            }
+            //    // get right side
+            //    int tmpV = index + "or ".Length;
+            //    string nextToken = sqlQuery.Substring(tmpV, sqlQuery.Length - tmpV);
+            //    string right = nextToken;
+            //    int RndexAND = right.IndexOf("and");
+            //    int RndexOR = right.IndexOf("or", 1);
+
+            //    RndexAND = (RndexAND == -1) ? 0 : RndexAND;
+            //    RndexOR = (RndexOR == -1) ? 0 : RndexOR;
+            //    int cndex = (RndexAND < RndexOR) ? RndexAND : RndexOR;
+            //    cndex = (cndex == 0) ? right.Length :cndex;
+            //    right = right.Substring(0, cndex);
+
+            //    list.Add(left.Trim());
+            //    list.Add(right.Trim());
+            //    prevIndex = index;
+            //}
+            List<string> list = sqlQuery.MultiSplit(new string[] { "and", "or" });
             return list;
         }
-
-        private bool? isValidExpression(SortedSet<string> expressionList)
+        
+        private bool? isValidExpression(List<string> expressionList)
         {
-            var stdOperaterToken = new List<string>(9) { "=", "like","not like", "<>", "!=", ">", "<", ">=", "<=" };
-            expressionList.Remove("");
             foreach (var item in expressionList)
             {
-                string stdOperator = stdOperaterToken.Find(m => item.Contains(m));
-                int index = item.IndexOf(stdOperator);
-                //get left of index
-                string left = item.Substring(0, index);
-
-                // get right of index without operator
-                int val = index + stdOperator.Length;
-                string right = item.Substring(val, item.Length - val);
-
-                if(isValidSqlExpression(left) && isValidSqlExpression(right))
-                    return false;
+                
             }
+            string[] stdOperaterToken = { "=", "like","not like", "<>", "!=", ">", "<", ">=", "<=" };
+            foreach (var item in expressionList)
+            {
+                foreach (var operand in item.MultiSplit(stdOperaterToken))
+                {
+                    //
+                    if(!isValidSqlExpression(operand))
+                    {
+                        return false;
+                    }
+                }
+            }
+            // obsolete
+            //foreach (var item in expressionList)
+            //{
+            //    string stdOperator = stdOperaterToken.Find(m => item.Contains(m));
+            //    int index = item.IndexOf(stdOperator);
+            //    //get left of index
+            //    string left = item.Substring(0, index);
+
+            //    // get right of index without operator
+            //    int val = index + stdOperator.Length;
+            //    string right = item.Substring(val, item.Length - val);
+
+            //    if(isValidSqlExpression(left) && isValidSqlExpression(right))
+            //        return false;
+            //}
             return true;
         }
 
