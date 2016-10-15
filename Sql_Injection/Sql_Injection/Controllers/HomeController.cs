@@ -98,20 +98,22 @@ namespace Sql_Injection.Controllers
         
         private bool? isValidExpression(List<string> expressionList)
         {
-            foreach (var item in expressionList)
-            {
-                
-            }
+            bool test = false;
             string[] stdOperaterToken = { "=", "like","not like", "<>", "!=", ">", "<", ">=", "<=" };
             foreach (var item in expressionList)
             {
+                test = false;
                 foreach (var operand in item.MultiSplit(stdOperaterToken))
                 {
                     //
-                    if(!isValidSqlExpression(operand))
+                    if(isValidSqlExpression(operand))
                     {
-                        return false;
+                        test = true;
                     }
+                }
+                if (!test)
+                {
+                    return false;
                 }
             }
             // obsolete
@@ -150,15 +152,15 @@ namespace Sql_Injection.Controllers
             }
             else if (value.Contains(quoteMark))
             { // then is string => constant
-                return true;
+                return false;
             }
             else
             {
                 double placeHold; // only used to satisfy function parameter
                 if (double.TryParse(value, out placeHold))
-                    return true; // if integer => constant
+                    return false; // if integer => constant
             }
-            return false;
+            return true;
         }
         private bool isValidRange(string[] array, int minTest, int maxText)
         {
