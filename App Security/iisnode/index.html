@@ -1,0 +1,87 @@
+<html>
+<head>
+    <title>iisnode logs</title>
+    <style type="text/css">
+        body
+        {
+            font-family: "Trebuchet MS" , Arial, Helvetica, sans-serif;
+        }
+        table
+        {
+            border-collapse: collapse;
+        }
+        td, th
+        {
+            border: 1px solid lightgray;
+            padding: 3px 7px 2px 7px;
+        }
+        th
+        {
+            text-align: left;
+            padding-top: 5px;
+            padding-bottom: 4px;
+            background-color: Gray;
+            color: #ffffff;
+        }
+        td.stderr
+        {
+            color: Red;
+        }
+    </style>
+</head>
+<body>
+    <table id="logFilesTable">
+        <tr>
+            <th>
+                Computer name
+            </th>
+            <th>
+                PID
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Created
+            </th>
+            <th>
+                Link
+            </th>
+        </tr>
+    </table>
+    <p id="lastUpdated"></p>
+    <script type="text/javascript">
+
+        // this is replaced with actual data at runtime by code in interceptor.js
+        var logFiles = [{"file":"ROBBIE-10000-stderr-1478093262354.txt","computername":"ROBBIE","pid":10000,"type":"stderr","created":1478093262354},{"file":"ROBBIE-10304-stderr-1478093263007.txt","computername":"ROBBIE","pid":10304,"type":"stderr","created":1478093263007},{"file":"ROBBIE-10436-stderr-1478093324610.txt","computername":"ROBBIE","pid":10436,"type":"stderr","created":1478093324610},{"file":"ROBBIE-10436-stdout-1478093324604.txt","computername":"ROBBIE","pid":10436,"type":"stdout","created":1478093324604},{"file":"ROBBIE-10540-stderr-1478093346605.txt","computername":"ROBBIE","pid":10540,"type":"stderr","created":1478093346605},{"file":"ROBBIE-10540-stdout-1478093346596.txt","computername":"ROBBIE","pid":10540,"type":"stdout","created":1478093346596},{"file":"ROBBIE-11236-stderr-1478093158542.txt","computername":"ROBBIE","pid":11236,"type":"stderr","created":1478093158542},{"file":"ROBBIE-2640-stderr-1478093413797.txt","computername":"ROBBIE","pid":2640,"type":"stderr","created":1478093413797},{"file":"ROBBIE-2816-stderr-1478093345990.txt","computername":"ROBBIE","pid":2816,"type":"stderr","created":1478093345990},{"file":"ROBBIE-2816-stdout-1478093345982.txt","computername":"ROBBIE","pid":2816,"type":"stdout","created":1478093345982},{"file":"ROBBIE-3732-stdout-1478093324207.txt","computername":"ROBBIE","pid":3732,"type":"stdout","created":1478093324207},{"file":"ROBBIE-4260-stderr-1478093216970.txt","computername":"ROBBIE","pid":4260,"type":"stderr","created":1478093216970},{"file":"ROBBIE-4300-stderr-1478093414420.txt","computername":"ROBBIE","pid":4300,"type":"stderr","created":1478093414420},{"file":"ROBBIE-5212-stderr-1478093375517.txt","computername":"ROBBIE","pid":5212,"type":"stderr","created":1478093375517},{"file":"ROBBIE-5932-stderr-1478093217701.txt","computername":"ROBBIE","pid":5932,"type":"stderr","created":1478093217701},{"file":"ROBBIE-5992-stderr-1478093424337.txt","computername":"ROBBIE","pid":5992,"type":"stderr","created":1478093424337},{"file":"ROBBIE-6336-stderr-1478093157873.txt","computername":"ROBBIE","pid":6336,"type":"stderr","created":1478093157873},{"file":"ROBBIE-6564-stderr-1478093376239.txt","computername":"ROBBIE","pid":6564,"type":"stderr","created":1478093376239},{"file":"ROBBIE-9488-stdout-1478093349531.txt","computername":"ROBBIE","pid":9488,"type":"stdout","created":1478093349531},{"file":"ROBBIE-9600-stderr-1478093424951.txt","computername":"ROBBIE","pid":9600,"type":"stderr","created":1478093424951},{"file":"ROBBIE-9752-stdout-1478093299083.txt","computername":"ROBBIE","pid":9752,"type":"stdout","created":1478093299083}];
+        var lastUpdated = 1478093425128;
+        var date = new Date();
+
+        date.setTime(lastUpdated);
+        document.getElementById('lastUpdated').innerHTML = 'Index was last updated ' + date;
+
+        logFiles.sort(function (a, b) {
+            return b.created - a.created;
+        });
+
+        var logFilesTable = document.getElementById("logFilesTable");
+        for (var i = 0; i < logFiles.length; i++) {
+            var logFile = logFiles[i];
+            date.setTime(logFile.created);
+            var row = logFilesTable.insertRow(-1);
+            var computerNameCell = row.insertCell(0);
+            var pidCell = row.insertCell(1);
+            var typeCell = row.insertCell(2);
+            var dateCell = row.insertCell(3);
+            var logCell = row.insertCell(4);
+            computerNameCell.innerHTML = logFile.computername;
+            pidCell.innerHTML = logFile.pid.toString();
+            typeCell.innerHTML = logFile.type;
+            typeCell.setAttribute('class', logFile.type);
+            dateCell.innerHTML = date.toString();
+            logCell.innerHTML = '<a href="' + logFile.file + '">log</a>';
+        };
+
+    </script>
+</body>
+</html>

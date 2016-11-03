@@ -1,0 +1,7 @@
+Application has thrown an uncaught exception and is terminated:
+ReferenceError: fs is not defined
+    at Server.<anonymous> (C:\Users\Rob\Documents\My Web Sites\App Security\server.js:6:5)
+    at emitTwo (events.js:106:13)
+    at Server.emit (events.js:191:7)
+    at HTTPParser.parserOnIncoming [as onIncoming] (_http_server.js:546:12)
+    at HTTPParser.parserOnHeadersComplete (_http_common.js:99:23)

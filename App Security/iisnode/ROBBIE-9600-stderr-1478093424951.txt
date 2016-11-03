@@ -1,0 +1,5 @@
+Application has thrown an uncaught exception and is terminated:
+RangeError: Invalid status code: 0
+    at ServerResponse.writeHead (_http_server.js:192:11)
+    at C:\Users\Rob\Documents\My Web Sites\App Security\server.js:10:13
+    at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:445:3)

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link rel="icon" href="~/Content/Images/favicon.ico" type="image/x-icon" />
+    <meta name="author" content="">
+    <title>SQL Injection</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+    <link type="text/css" rel="stylesheet" href="./materialize/css/materialize.min.css"/>    
+    <link type="text/css" rel="stylesheet" href="./Site.css"/>    
+    <script type="text/javascript" src="./custom.js"></script>
+</head>
+<body>
+    <nav class="blue darken-1" role="navigation">
+        <div class="nav-wrapper container">
+            <a id="logo-container" href="~/Home/Index" class="brand-logo">SQL Injection Testing</a>
+            <!--<ul class="right hide-on-med-and-down">
+                <li><a href="">Attack 1</a></li>
+                <li><a href="">Attack 2</a></li>
+                <li><a href="">Attack 3</a></li>
+            </ul>
+            <ul id="nav-mobile" class="side-nav">
+                <li><a href="">Attack 1</a></li>
+                <li><a href="">Attack 2</a></li>
+                <li><a href="">Attack 3</a></li>
+            </ul>
+            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+            -->
+        </div>
+    </nav>
+    <main>
+        <div id="card" class="card blue darken-1">
+            <div class="card-content white-text">
+                <span class="card-title" id="messageOutToUser"></span>
+                <br/>
+                Enter a Query testing will be done if there is a where.</p>
+                SQL Query: <input type="text" id="fname" onkeyup="inputChange()">
+            </div>
+        </div>
+    </main>
+    <script type="text/javascript" src="./materialize/js/materialize.min.js"></script>
+    <script type="text/javascript" src="./jquery-2.1.1.min.js"></script>
+    
+</body>
+</html>
