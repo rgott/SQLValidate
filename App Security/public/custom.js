@@ -1,46 +1,60 @@
-//tester();
 var messageOutToUser = "";
-function testValidate(str,value,expectedValue)
+
+//#region testing section
+var FAILED = 0;
+var PASSED = 0;
+
+//tester();
+
+function testValidate(value,expectedValue)
 {
-    var tmp;
     if(value == expectedValue)
-    {
-        tmp = " PASSED";
-    }
+        PASSED++;
     else
-    {
-        tmp = " FAILED: need " + expectedValue;
-    }
-    console.log(str + tmp);
+        console.log("TEST "+ FAILED++ + " FAILED: need " + expectedValue);    
 }
 function tester()
 {
     var inputString;
-    testValidate("TEST 1",IsValidExpression("select * from table where 1 = 5"),false);
 
-    testValidate("TEST 2",IsValidExpression("select * from table where 1 = "),true);
+    testValidate(IsValidExpression("select * from table where 1 = 5"),false);
 
-    testValidate("TEST 3",IsValidExpression("select * from table where 1"),true);
+    testValidate(IsValidExpression("select * from table where 1 = "),true);
 
-    testValidate("TEST 4",IsValidExpression("select * from table where "),true);
+    testValidate(IsValidExpression("select * from table where 1"),true);
 
-    testValidate("TEST 5",IsValidExpression("select * from table where blah = blah"),false);
+    testValidate(IsValidExpression("select * from table where "),true);
+
+    testValidate(IsValidExpression("select * from table where blah = blah"),false);
     
-    testValidate("TEST 6",IsValidExpression("select * from table where blah = 1 or 1 = 1"),false);
+    testValidate(IsValidExpression("select * from table where blah = 1 or 1 = 1"),false);
 
-    testValidate("TEST 7",IsValidExpression("select * from table where '1' = '1'"),false);
+    testValidate(IsValidExpression("select * from table where '1' = '1'"),false);
 
-    testValidate("TEST 8",IsValidExpression("select * from table where A(3 - (6 * 9)) * toInt('6') = 6"),false);
+    testValidate(IsValidExpression("select * from table where A(3 - (6 * 9)) * toInt('6') = 6"),false);
 
-    testValidate("TEST 9",IsValidExpression("select * from table where A(B(C(D(6 * 6))* 4)) = 42"),false);
+    testValidate(IsValidExpression("select * from table where A(B(C(D(6 * 6))* 4)) = 42"),false);
 
-    testValidate("TEST 10",IsValidExpression("select * from table where A(B(C(D(6 * 6))* column))"),true);
+    testValidate(IsValidExpression("select * from table where A(B(C(D(6 * 6))* column))"),true);
 
-    testValidate("TEST 11",IsValidExpression("select * from table where A(3 - (6 * 9)) * toInt(column)"),true);
+    testValidate(IsValidExpression("select * from table where A(3 - (6 * 9)) * toInt(column)"),true);
 
-    testValidate("TEST 12",IsValidExpression("select * from table where 1 * 1 = 1"),false);
+    testValidate(IsValidExpression("select * from table where 1 * 1 = 1"),false);
 
+    testValidate(IsValidExpression("select * from table where 1 * Func(1) = 23"),false);
+
+    testValidate(IsValidExpression("select * from table where 1 * --Func(1) = 23"),false);
+
+
+    console.log("Testing Complete\nPASSED: " + PASSED + "\nFAILED: " + FAILED);
 }
+//#endregion testing section
+
+
+/*
+ will be used by the .html page to grab information
+ from the document and then return results to the page
+ */
 function inputChange()
 {
     var inputString = document.getElementById("fname").value;
@@ -59,7 +73,7 @@ function inputChange()
 }
 function IsValidExpression(sqlQuery)
 {
-    var readyParse = readyForParse(sqlQuery);
+    var readyParse = readyWhereForParse(sqlQuery);
 
     if(!readyParse)
         return true;// no string to parse
@@ -67,9 +81,7 @@ function IsValidExpression(sqlQuery)
     if(!passedPreTestConditions(sqlQuery))
         return false; // messageOutToUser is set in passedPreTestConditions
 
-
     var expressionList = MultiSplit(readyParse, ["and","or"]);
-
 
     for(i = 0; i < expressionList.length; i++)
     {
@@ -96,18 +108,20 @@ function IsValidExpression(sqlQuery)
                 return false;
             }
         }
-        
     }
     return true;
 }
 
-// if sql constant then return true
+/*
+ if sql constant then return true
+ constants are strings or integers or functions
+*/
 function HasSqlConstants(value)
 {
     var stoValue = value;
     var quoteMark = "'";
 
-    // tests function case remove functions
+    // remove functions constants to try to find any non-constants
     if(value.includes("("))
     {
         // functions are treated as constants and are removed
@@ -125,17 +139,14 @@ function HasSqlConstants(value)
         {
             return false;
         }
-        //will never enter function test again just contant part
-        // if(!HasSqlConstants(operand[i].trim()))
-        // {
-        //     // if non constant then is valid;
-        //     return false;
-        // }
     }
     messageOutToUser = stoValue + " contains all constants"
     return true;
 }
 
+
+// tests performed after query is ready to be 
+// parsed to determine if it can quickly fail
 function passedPreTestConditions(sqlQuery)
 {
     // continue with pre condition tests
@@ -148,11 +159,18 @@ function passedPreTestConditions(sqlQuery)
         return false;
     }
     
-    // more pre-conditions
+    //TODO: more pre-conditions
 
     return true;
 }
 
+/*
+Given a string @value : string, @findIndexes : string[] 
+will find all values on either side
+and return the operands as an array 
+
+NOTE: consumes findIndexes
+*/
 function MultiSplit(value,findIndexes)
 {
     var list = [];
@@ -161,6 +179,7 @@ function MultiSplit(value,findIndexes)
         var min = value.length;
         var minValue = "";
         
+        // finds minimum index in the findIndexes array
         for(i = 0; i < findIndexes.length; i++)
         {// find minimum
             var index = value.indexOf(findIndexes[i]);
@@ -196,20 +215,20 @@ function MultiSplit(value,findIndexes)
     return list;
 }
 
-function readyForParse(sqlQuery)
+function readyWhereForParse(sqlQuery)
 {
     // equalize string for parser
     sqlQuery = sqlQuery.toLowerCase();
 
     var indexOfWhereClause = sqlQuery.indexOf("where");
-    if(indexOfWhereClause == -1)
+    if(indexOfWhereClause == -1) // if were not found then return nothing
         return "";
     
     // get everything after "where" clause
-    indexOfWhereClause += "where".length;
-
+    indexOfWhereClause += "where".length; // remove the actual where word
     sqlQuery = sqlQuery.substring(indexOfWhereClause,sqlQuery.length);
 
+    // remove ; and replace " with '
     sqlQuery = sqlQuery
                 .replace(";","")
                 .replace(/['"]+/g,"'")
