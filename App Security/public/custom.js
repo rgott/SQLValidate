@@ -38,6 +38,8 @@ function tester()
 
     testValidate("TEST 11",IsValidExpression("select * from table where A(3 - (6 * 9)) * toInt(column)"),true);
 
+    testValidate("TEST 12",IsValidExpression("select * from table where 1 * 1 = 1"),false);
+
 }
 function inputChange()
 {
@@ -59,11 +61,12 @@ function IsValidExpression(sqlQuery)
 {
     var readyParse = readyForParse(sqlQuery);
 
+    if(!readyParse)
+        return true;// no string to parse
+    
     if(!passedPreTestConditions(sqlQuery))
         return false; // messageOutToUser is set in passedPreTestConditions
 
-    if(!readyParse)
-        return true;// no string to parse
 
     var expressionList = MultiSplit(readyParse, ["and","or"]);
 
@@ -104,7 +107,7 @@ function HasSqlConstants(value)
     var stoValue = value;
     var quoteMark = "'";
 
-    // tests function case
+    // tests function case remove functions
     if(value.includes("("))
     {
         // functions are treated as constants and are removed
@@ -112,30 +115,25 @@ function HasSqlConstants(value)
                     .replace(/[a-z1-9]+[(]/g,"")
                     .replace(/[(]/g,"")
                     .replace(/[)]/g,"");
-        
-        var operand = MultiSplit(value,["*","/","-","+"]);
+    }
+    
+    var operand = MultiSplit(value,["*","/","-","+"]);
 
-        for(i = 0; i < operand.length; i++)
+    for(i = 0; i < operand.length; i++)
+    {
+        if(!operand[i].includes(quoteMark) && isNaN(operand[i]))
         {
-            // will never enter function test again just contant part
-            if(!HasSqlConstants(operand[i].trim()))
-            {
-                messageOutToUser = stoValue + " contains all constants"
-                // if non constant then is valid;
-                return false;
-            }
+            return false;
         }
-        return true; // no non constant found        
+        //will never enter function test again just contant part
+        // if(!HasSqlConstants(operand[i].trim()))
+        // {
+        //     // if non constant then is valid;
+        //     return false;
+        // }
     }
-    else if(value.includes(quoteMark))
-    {
-        return true;
-    }
-    else
-    {
-        return !isNaN(value); // is a number return true
-    }
-    // TODO: add arithmetic operations (e.g. 3 * 3) Hint: recursion may be required
+    messageOutToUser = stoValue + " contains all constants"
+    return true;
 }
 
 function passedPreTestConditions(sqlQuery)
@@ -144,14 +142,14 @@ function passedPreTestConditions(sqlQuery)
     // query is garanteed lower case
 
     if(sqlQuery.includes("--") 
-    || sqlQuery.includes("/*")
-    //|| sqlQuery.includes("")
-    )
+    || sqlQuery.includes("/*"))
     {
         messageOutToUser = "Query contained a comment"
         return false;
     }
     
+    // more pre-conditions
+
     return true;
 }
 
