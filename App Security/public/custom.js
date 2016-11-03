@@ -1,17 +1,20 @@
 var messageOutToUser = "";
 
+//TODO:next version show where the first error is in the text
+var errorPartitionText = "";
+
 //#region testing section
 var FAILED = 0;
 var PASSED = 0;
 
-tester();
+//tester();
 
 function testValidate(value,expectedValue)
 {
     if(value == expectedValue)
         PASSED++;
     else
-        console.log("TEST "+ FAILED++ + " FAILED: need " + expectedValue);    
+        console.log("TEST "+ (FAILED++ + PASSED) + " FAILED: need " + expectedValue);    
 }
 function tester()
 {
@@ -47,6 +50,8 @@ function tester()
     
     testValidate(IsValidExpression("select * from table where 1 * 1 - 1 + 1 / 1 = 1"),false);
 
+    testValidate(IsValidExpression("select * from table where t = 6 or two = 2"),true);
+
     console.log("Testing Complete\nPASSED: " + PASSED + "\nFAILED: " + FAILED);
 }
 //#endregion testing section
@@ -62,8 +67,8 @@ function inputChange()
 	// var inputString = "select * from table where 1 = 1";
     if(IsValidExpression(inputString))
     {
-        $('#card').addClass('green').removeClass('red').removeClass('blue');
 
+        $('#card').addClass('green').removeClass('red').removeClass('blue');
         document.getElementById("messageOutToUser").innerHTML = "Success!";
     }  
     else
@@ -84,10 +89,10 @@ function IsValidExpression(sqlQuery)
 
     var expressionList = MultiSplit(readyParse, ["and","or"]);
 
-    for(i = 0; i < expressionList.length; i++)
+    for(k = 0; k < expressionList.length; k++)
     {
         var stdOperaterToken = [ "=", "like", "not like", "<>", "!=", ">", "<", ">=", "<=" ];
-        var tmpForVar = MultiSplit(expressionList[i],stdOperaterToken);
+        var tmpForVar = MultiSplit(expressionList[k],stdOperaterToken);
 
         if(tmpForVar.length % 2 == 1)
             tmpForVar.pop();
@@ -137,7 +142,7 @@ function HasSqlConstants(value)
     for(i = 0; i < operand.length; i++)
     {
         if(!operand[i].includes(quoteMark) && isNaN(operand[i]))
-        {
+        { // does not include quote mark is not a number then not a constant
             return false;
         }
     }
