@@ -4,7 +4,7 @@ var messageOutToUser = "";
 var FAILED = 0;
 var PASSED = 0;
 
-//tester();
+tester();
 
 function testValidate(value,expectedValue)
 {
@@ -44,7 +44,8 @@ function tester()
     testValidate(IsValidExpression("select * from table where 1 * Func(1) = 23"),false);
 
     testValidate(IsValidExpression("select * from table where 1 * --Func(1) = 23"),false);
-
+    
+    testValidate(IsValidExpression("select * from table where 1 * 1 - 1 + 1 / 1 = 1"),false);
 
     console.log("Testing Complete\nPASSED: " + PASSED + "\nFAILED: " + FAILED);
 }
